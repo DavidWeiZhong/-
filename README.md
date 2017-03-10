@@ -56,3 +56,44 @@ public class MyActivity extends Activity {
 Handler 在activity 的onDestory 中removeMessageAndCallback(null)
 io流记得关闭
 使用了registReciver,一定要记得使用UnregistReciver
+
+# 传统的app检测跟新和自动更新
+
+
+自动更新，
+
+1、使用前端框架，如果是这种情况的话，整个应用都没有多少原生的东西，比较火的框架：React Native、ionic等；
+2、纯原生，这种方式是通过图片下载，本地图片读取，动态生成StateListDrawable，大致这样一个流程实现不更新应用就更新底部按钮的图标；
+3、JS交互：将整个底部按钮做成H5，然后使用webview加载，这也是今天的重点。（京东， 淘宝，下面的按钮键就是这样子，可以根据节日来变化，还有斗鱼的）
+
+传统更新，
+
+用户在登陆的时候，像服务器发送一个请求，服务器返回版本号，与自己app的版本号匹配，如果不一致，则弹出下载新版本的dialog提示用户下载（检测跟新），app中写好下载的io流代码，然后写好自动安装的代码，这里用户下载的都是在服务器上面已经加固了（360加固）的app，而不是在应用商店中的app
+
+
+#3，app加固
+
+1，可以用360加密app然后发布到应用市场中去（全自动的）
+
+#4，应用发布到小米商店，Android市场
+需要到他们的市场上面提交审核，如营业许可证，app不同分辨率的logo，等等，第一次提交的时候会复杂一点，后面就好了
+
+
+#4，数据库SQLite版本的更新
+
+讲一下大致的方法吧
+
+在Andoird的SQLiteOpenHelper类中有一个onUpgrade方法中：
+如果你的数据库需要升级，及某一个表中需要增加字段，而又不想丢失之前的数据
+
+比如你先改user表
+则1，将旧的user表改一下表名temp_user
+  2,新建一个user表（新增字段或则删除了字段）
+  3将将旧表的数据保存到新表中
+  4，删除旧表（temp_user）
+  
+  怎么知道数据库需要升级呢，在这个方法中有参数oldVersion和当前版本数据库的version进行对比就知道了数据库需要升级了
+  
+  具体可以参考http://blog.csdn.net/crystalddd/article/details/37742021
+  
+  下午研究一下数据库升级吧
