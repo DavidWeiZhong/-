@@ -229,7 +229,11 @@ io流记得关闭
 //            //把东西复制
 //
             sqLiteDatabase.execSQL(" INSERT INTO book SELECT *, '1' FROM older_book");//1代表给sex赋予默认值
+            
+            
             //删除旧表
+            
+            
             sqLiteDatabase.execSQL("DROP TABLE older_book");
             Toast.makeText(mContext, "数据库升级成功", Toast.LENGTH_SHORT).show();
         }
