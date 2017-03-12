@@ -97,3 +97,139 @@ io流记得关闭
   具体可以参考http://blog.csdn.net/crystalddd/article/details/37742021
   
   下午研究一下数据库升级吧
+  
+  首先是创建一个数据库
+  
+  自定义MySQLiteHlder extends SQLiteOpenHelper,然后有一个构造方法
+  private Context mContext;
+    public MySQLiteHlder(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version);
+        this.mContext = context;
+    }
+    
+ 还有，两个重载方法 
+ 
+  public static final String CREATE_BOOK = "create table book ("
+
+            + "id integer primary key autoincrement, "
+
+            + "author text, "
+
+            + "price real, "
+
+            + "pages integer, "
+
+            + "name text)";
+
+    public static final String CREATE_BOOK_2 = "create table book ("
+
+            + "id integer primary key autoincrement, "
+
+            + "author text, "
+
+            + "price real, "
+
+            + "pages integer, "
+
+            + "name text,"
+
+            +"sex text)";
+
+   
+   //执行操作数据库
+    @Override
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        sqLiteDatabase.execSQL(CREATE_BOOK);//初次创建book表的时候会调用改方法，以后重复创建不会调用该方法
+        Toast.makeText(mContext, "Create succeeded", Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 数据库升级要调用的方法
+     * @param sqLiteDatabase
+     * @param i，旧版本的数据库版本
+     * @param i1，新版本数据库版本 */，当数据库版本改变的时候会调用改方法
+    @Override
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    
+    
+    
+    
+    接着在MainActivity中
+    
+     public void btnclick(View view) {
+        switch (view.getId()) {
+            case R.id.btn1:
+                mMySQLiteHlder = new MySQLiteHlder(this, "MyDb.db", null, 1);//数据库的版本为1
+                //创建一个数据库，第二次就不会调用onCreate了
+                mWritableDatabase = mMySQLiteHlder.getWritableDatabase();
+                break;
+            case R.id.btn2:
+                mContentValues = new ContentValues();//值得注意的是，每次操作数据的时候都要新建一个ContentValues
+             mContentValues.put("id", 12);
+                mContentValues.put("author", "邱伟中");
+                mContentValues.put("price", 100);
+                mContentValues.put("pages", 10000);
+                mContentValues.put("name", "我知道伤心不能代表什么");
+                mWritableDatabase.insert("book", null,mContentValues);
+                Toast.makeText(this, "插入数据成功", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btn3:
+                //更新数据
+                ContentValues contentValues = new ContentValues();//值得注意的是，每次操作数据的时候都要新建一个ContentValues
+                contentValues.put("author", "邱邱邱");//把邱伟中改成邱邱邱
+                mWritableDatabase.update("book", contentValues, "id = 1", null);
+                Toast.makeText(this, "数据更新成功", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btn4:
+                //查询数，哈哈
+                Cursor cursor = mWritableDatabase.rawQuery("select * from book where price like '%" + 1 + "%'", null);//模糊查询id有1的用户
+                while(cursor.moveToNext()) {
+                    int anInt = cursor.getInt(0);//获取第一列的值
+                    String anInt1 = cursor.getString(1);
+                    int anInt2 = cursor.getInt(2);//获取第三列的值
+                    Log.d("print", "" + anInt + "----" + anInt1 + "---" + anInt2);
+                }
+                Toast.makeText(this, "查询成功", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btn5:
+                //数据库的升级
+                mMySQLiteHlder = new MySQLiteHlder(this, "MyDb.db", null, 2);//数据库的版本变为了2
+                //创建一个数据库，第二次就不会调用onCreate了
+                mWritableDatabase = mMySQLiteHlder.getWritableDatabase();
+                break;
+
+        }
+        
+        
+        现在来具体看看数据库升级的吧，背景，以前的数据库表名字为book,后来需求发展，要在book上面新增sex字段
+        1，把旧版数据库表book改一下名字,改为older_book
+        2,新建一个book表，增加了sex字段的
+        3，吧older_book的数据复制给book表，以防书丢失
+        4，删除older_book表
+        
+        
+        具体在onUpgrade方法里面进行数据库的更新，其中app的重新安装不会把数据库数据格式化，只有把app卸载了才会
+        
+         /**
+     * 数据库升级要调用的方法
+     * @param sqLiteDatabase
+     * @param i
+     * @param i1
+     */
+    @Override
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+
+        if (i != i1) {
+            Toast.makeText(mContext, "数据库要升级了", Toast.LENGTH_LONG).show();
+            //修改表名
+            sqLiteDatabase.execSQL("ALTER TABLE book RENAME TO older_book");
+            //创建一个临时表名（增加了新字段的），和旧表名字一样
+            sqLiteDatabase.execSQL(CREATE_BOOK_2);
+
+//            //把东西复制
+//
+            sqLiteDatabase.execSQL(" INSERT INTO book SELECT *, '1' FROM older_book");//1代表给sex赋予默认值
+            //删除旧表
+            sqLiteDatabase.execSQL("DROP TABLE older_book");
+            Toast.makeText(mContext, "数据库升级成功", Toast.LENGTH_SHORT).show();
+        }
