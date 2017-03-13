@@ -75,6 +75,10 @@ io流记得关闭
 
 #内存泄漏查看工具：square的泄漏金丝雀，LeakCanary
 
+用Eclipse开发自带的内存检测工具：Heap。
+
+DDMS中的Heap工具用于大致分析是否存在“内存泄漏”，而MAT工具则用于分析“内存泄漏”发生在哪里，MAT工具中,File->Open Heap Dump，可以打开xxx.hprof文件分析。这个我现在不用。不多说。直接看下面介绍的LeakCanary。
+
 1,在bulid.gradle
 compile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
 
