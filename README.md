@@ -86,6 +86,55 @@ public class ExampleApplication extends Application{
     LeakCanary.install(this);
   }
 }
+现在来模拟一个内存泄漏的过程，先在MainActivity里面点击进入OtherActivity，OtherActivity里面有两个按钮，一个button1是发送handle.postDelayed的，一个button2是用来结束OtherActivity的，这样当点击了button1,延时8秒的按钮期间在点击button2结束当前activity就会发生内存溢出，因为handler持有一个OtherActivity的引用，但是OtherActivity已经结束了，就会发生内存溢出
+下面是具体的代码
+MainaActivity
+
+public void btnclick(View view) {
+        startActivity(new Intent(this, OtherActivity.class));
+    }
+    
+    
+  OtherActivity
+  
+  
+   private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 1) {
+//                Toast.makeText(OtherActivity.this, "测试内存溢出", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_other);
+        findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OtherActivity.this.finish();
+            }
+        });
+    }
+
+    public void btnclick(View vie) {
+        Message message = new Message();
+        message.arg1 = 123;
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+//                Toast.makeText(OtherActivity.this, "测试内存溢出", Toast.LENGTH_SHORT).show();
+            }
+        }, 8000);
+
+    }
+    
+    
+    然后你运行程序，先点击MainActivit里面的button1,跳转到OtherActivity，在点击OtherActivity里面的开始handler.postDelayed，然后过个1秒钟点击结束的按钮回退回MainActivity，这样屏幕上面就会弹出LeackCanary的Toask，同时在通知栏上面也会有相应的通知点击通知就可以看到具体是哪个类，泄漏类多少内存了，也可以在log中查看相应的内存泄漏信息，图片请参考
+    
+    
 # 传统的app检测跟新和自动更新
 
 
