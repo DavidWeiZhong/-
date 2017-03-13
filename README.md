@@ -56,6 +56,7 @@ public class MyActivity extends Activity {
 Handler 在activity 的onDestory 中removeMessageAndCallback(null)
 io流记得关闭
 使用了registReciver,一定要记得使用UnregistReciver
+内存泄漏的原因有很多，比如activity的context引用，static引用，广播未取消注册，MVP设计时没有detachView，Rx没有取消subscribe订阅，动画处理等
 
 # 传统的app检测跟新和自动更新
 
