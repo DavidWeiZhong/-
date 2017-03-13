@@ -378,4 +378,7 @@ public void btnclick(View view) {
     }
 ，然后就不用做什么处理了，运行程序就可以了，运行效果图如图所示
 
+![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170313165301.png)
+![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170313165311.png)
+
 
