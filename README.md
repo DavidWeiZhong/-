@@ -133,7 +133,8 @@ public void btnclick(View view) {
     
     
     然后你运行程序，先点击MainActivit里面的button1,跳转到OtherActivity，在点击OtherActivity里面的开始handler.postDelayed，然后过个1秒钟点击结束的按钮回退回MainActivity，这样屏幕上面就会弹出LeackCanary的Toask，同时在通知栏上面也会有相应的通知点击通知就可以看到具体是哪个类，泄漏类多少内存了，也可以在log中查看相应的内存泄漏信息，图片请参考
-    
+    ![](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ%E6%88%AA%E5%9B%BE20170313110534.png)
+    ![](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170313110543.png)
     
 # 传统的app检测跟新和自动更新
 
