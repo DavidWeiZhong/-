@@ -5,6 +5,16 @@
 
 1，hander的使用很常见吧，使用hander的时候经常会造成内存泄漏，所以在使用hander的时候，尽量新建一个静态的类然后继承hander
 
+如果用Android studio开发，写handle发送消息，下面的写法会有黄色警告，因为可能会引发内存泄漏:
+
+private Handler mHandler = new Handler() {
+    @Override
+    public void handleMessage(Message msg) {
+        super.handleMessage(msg);
+    }
+};
+
+为什么呢？非静态内部类会引用外部类对象（Activity），当它使用了 postDelayed 的时候，如果 Activity 已经 finish 了，而这个 handler 仍然引用着这个 Activity 就会致使内存泄漏，因为这个 handler 会在一段时间内继续被 mainLooper 持有，导致引用仍然存在，在这段时间内，如果内存不够使，可能OOM了。所以在这里要是使用了handle.postdelayed的时候就很可能造成你村泄漏
 在自定义MyHander类中实例化一个外部类的WeakReference（弱引用）并且在Handler初始化时传入这个对象给你的Handler；将所有引用的外部类成员使用
 
 WeakReference对象，英文静态内部类不会持有外部类的引用
@@ -58,6 +68,24 @@ io流记得关闭
 使用了registReciver,一定要记得使用UnregistReciver
 内存泄漏的原因有很多，比如activity的context引用，static引用，广播未取消注册，MVP设计时没有detachView，Rx没有取消subscribe订阅，动画处理等
 
+所以平时要注意
+使用Application的context
+需要上下文的时候，如果不是非得activity对象，传入Application的context,因为Application的context的生命周期比Activity长，它是app全局的，相当于static的生命周期。static变量不要引用view实例
+
+
+#内存泄漏查看工具：square的泄漏金丝雀，LeakCanary
+
+1,在bulid.gradle
+compile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+
+
+//然后在你的Application的子类中install:
+public class ExampleApplication extends Application{
+  @Override public void onCreate() {
+    super.onCreate();
+    LeakCanary.install(this);
+  }
+}
 # 传统的app检测跟新和自动更新
 
 
