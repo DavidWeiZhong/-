@@ -382,3 +382,16 @@ public void btnclick(View view) {
 ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170313165311.png)
 
 
+#定时器的使用，可以用于每隔一秒就发送一个消息，banner无线滚动就可以用这个做
+
+//定义一个计时器,设置为延迟0ms后执行，每隔1s执行一次（这里如果设置为 timer.schedule(task,1000)表示执行一次）
+        new Timer().schedule(new TimerTask(){
+            @Override
+            public void run() {
+                Message message = new Message();
+                message.arg1 = 123;
+                mHandler.sendMessage(message);
+            }
+        }, 0, 1000);
+
+
