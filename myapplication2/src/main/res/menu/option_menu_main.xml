@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/contact_us"
+            android:orderInCategory="1"
+            android:showAsAction=""
+            android:title="联系我们"/>
+
+        <item android:title="关于我们"/>
+    </group>
+
+    <group>
+        <item android:title="系统设置"
+
+              android:orderInCategory="2"
+              android:icon="@mipmap/ic_launcher"
+              android:id="@+id/system_setting"
+            >
+            <menu>
+                <item android:title="亮度设置" android:id="@+id/liangdu"/>
+                <item android:enabled="false" android:title="主题设置" android:id="@+id/theme"/>
+            </menu>
+        </item>
+    </group>
+
+
+</menu>

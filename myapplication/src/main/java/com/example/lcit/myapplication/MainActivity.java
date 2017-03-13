@@ -5,6 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+/**
+ * 模拟内存溢出的Moudle
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override
