@@ -320,3 +320,62 @@ public void btnclick(View view) {
             sqLiteDatabase.execSQL("DROP TABLE older_book");
             Toast.makeText(mContext, "数据库升级成功", Toast.LENGTH_SHORT).show();
         }
+
+#Activity中菜单（menu）的使用
+
+首先在res 目录下新建一个menu 文件夹，右击res 目录→New→Folder，输入文件夹名menu，点击Finish。接着在这个文件夹下再新建一个名叫main 的菜单文件，右击menu 文件夹→New→Android XML File,下面的代码是写option_menu_main.xml文件的
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/contact_us"
+            android:orderInCategory="1"
+            android:showAsAction=""
+            android:title="联系我们"/>
+
+        <item android:title="关于我们"/>
+    </group>
+
+    <group>
+        <item android:title="系统设置"
+
+              android:orderInCategory="2"
+              android:icon="@mipmap/ic_launcher"
+              android:id="@+id/system_setting"
+            >
+<!—二级菜单
+            <menu>
+                <item android:title="亮度设置" android:id="@+id/liangdu"/>
+                <item android:enabled="false" android:title="主题设置" android:id="@+id/theme"/>
+            </menu>
+        </item>
+    </group>
+
+
+</menu>
+
+然后在Activity中重写两个方法，onCreateOptionsMenu，和onOptionsItemSelected
+
+@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.option_menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.liangdu:
+                Toast.makeText(this, "点击了亮度", 1).show();
+//                startActivity(new Intent(this, LiangduActivity.class));
+                break;
+            case R.id.contact_us:
+                Toast.makeText(this, "点击了关于我们", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
+    }
+，然后就不用做什么处理了，运行程序就可以了，运行效果图如图所示
+
+
