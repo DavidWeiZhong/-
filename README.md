@@ -382,6 +382,7 @@ public void btnclick(View view) {
 ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170313165311.png)
 
 
+值得注意的是，在fragment中如果要有菜单的话，除了重载上面的两个方法外，还必须在onCreat()中setHasOptionsMenu(true);把其打开
 #定时器的使用，可以用于每隔一秒就发送一个消息，banner无线滚动就可以用这个做
 
 //定义一个计时器,设置为延迟0ms后执行，每隔1s执行一次（这里如果设置为 timer.schedule(task,1000)表示执行一次）
@@ -394,4 +395,68 @@ public void btnclick(View view) {
             }
         }, 0, 1000);
 
+#数据的恢复onSaveInstanceState
 
+我们知道，当Configuration Change发生的时候（比如横竖屏切换等），会导致Activity重启，即先destroy，然后会restart，一般情况下restart的时间比较短，为了保证一致的用户体验，我们应该在Activity重启前将一些数据存储下来，然后在restart的时候重新根据这些数据更新UI。当然你可能想将这些数据写到物理文件或数据库中，但是这样有缺点，因为IO操作时耗时操作，会影响restart的过程，甚至导致ANR程序无响应，本文将介绍几种将数据缓存在内存中以便restart时进行恢复的方法，所以数据的恢复和保存尤为的重要
+一提到数据的恢复可能就会想到onSaveInstanceState()方法了，其实这个方法最常用的是恢复view的状态，比如你选择了一个checkBox然后以横竖屏回来之后checkBox依然是你选择的那一个，还比如播放视频的室友进度条的长度等等，即存储UI持久化的一些信息，值得注意的是，如果用户显式地通过back键退出了程序，那么不会调用onSaveInstanceState方法。
+
+而且我发现，在代码里面控制手机横竖屏切换，也并不会调用onSaveInstanceState,但是这样切换横竖屏了以后再onCreat()里面的onSaveInstanceState对象并不等于空，不知道为什么就是做不出来效果，但是如果不用代码的控制，而是手机的方向锁定没有打开来，手动横竖屏的话就会产生效果了。
+等等，经过我的分析，原来是我搞错了，onSaveInsanceState()有两个重载方法，不要搞错了，用只有一个参数的，智障！！！
+好了，言归正传
+使用场景，视频播放进度条，小说读的页数，view的状态等等
+
+案列
+
+public class MainActivity extends AppCompatActivity {
+
+    boolean mBoolean = false;
+    private CheckBox cb1, cb2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            String cb2 = savedInstanceState.getString("cb");
+            Log.d("print", "" + cb2 + "---" );
+//            this.cb2.setTextColor(Color.parseColor(savedInstanceState.getString("cb2")));
+        }
+        setContentView(R.layout.activity_main);
+        cb1 = (CheckBox) findViewById(R.id.cb1);
+        cb2 = (CheckBox) findViewById(R.id.cb2);
+
+
+    }
+
+    public void btnclick(View view) {
+        Log.d("print", "" + mBoolean);
+        if (mBoolean) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            //竖屏设置
+            mBoolean = false;
+        } else {
+            mBoolean = true;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            //横屏设置
+        }
+        Log.d("print", "" + mBoolean);
+    }
+
+    public void btnclick1(View view){
+        startActivity(new Intent(this, OtherActivity.class));
+
+}
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("cb", "123456");
+        outState.putString("cb2", "#ff0000");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        Log.d("print", "" + savedInstanceState.getString("cb"));
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+}
