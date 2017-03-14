@@ -395,8 +395,9 @@ public void btnclick(View view) {
             }
         }, 0, 1000);
 
-#数据的恢复onSaveInstanceState
+#数据的恢复onSaveInstanceState  restart过程中涉及到的四种数据存储恢复的方法
 
+1，onSaveInstanceState，用的还是比较常见的。
 我们知道，当Configuration Change发生的时候（比如横竖屏切换等），会导致Activity重启，即先destroy，然后会restart，一般情况下restart的时间比较短，为了保证一致的用户体验，我们应该在Activity重启前将一些数据存储下来，然后在restart的时候重新根据这些数据更新UI。当然你可能想将这些数据写到物理文件或数据库中，但是这样有缺点，因为IO操作时耗时操作，会影响restart的过程，甚至导致ANR程序无响应，本文将介绍几种将数据缓存在内存中以便restart时进行恢复的方法，所以数据的恢复和保存尤为的重要
 一提到数据的恢复可能就会想到onSaveInstanceState()方法了，其实这个方法最常用的是恢复view的状态，比如你选择了一个checkBox然后以横竖屏回来之后checkBox依然是你选择的那一个，还比如播放视频的室友进度条的长度等等，即存储UI持久化的一些信息，值得注意的是，如果用户显式地通过back键退出了程序，那么不会调用onSaveInstanceState方法。
 
@@ -460,3 +461,35 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
     }
 }
+ 另外bundle中的savedInstanceState不能存储一些大数据，如大的bitmip
+ 
+ 
+ 2使用静态变量存储数据
+ 
+ 我们知道Java中如果一个类的成员变量是static的，那么该static成员变量的生命周期就与该类的生命周期相同，具体来说：当Java虚拟机加载该类的时候，就会给该类的static成员变量分配内存空间；当Java虚拟机卸载该类的时候，该类的static成员变量的内存才会被回收。Android也具有该特性，假设我们的Activity中有一个static的成员变量，在Activity进行restart的过程中，Java虚拟机没有卸载掉该Activity，因为在后面的restart的过程中会用到，所以在restart过程中，该Activity的static的成员变量的内存没有被回收，这样我们就可以在restart之前往该Activity的static成员变量中写入值，在restart之后从Activity的static成员变量中读取值，这样就跨restart过程持有了数据。使用该特性也要注意，在非restart导致的destroy的时候，我们需要将Activity的static成员变量赋值为null，防止内存泄露。，注意啊，要防止内存溢出！！！！！static级别的都属于类级别的，哈哈
+ 
+ 
+ 3onPuse()
+ 
+ 
+ 翻译过来就是：无论出现怎样的情况，比如程序突然死亡了，能保证的就是onPause方法是一定会调用的，而onStop和onDestory方法并不一定，所以这个特性使得onPause是持久化相关数据的最后的可靠时机。当然onPause方法不能做大量的操作，这会影响下一个Activity入栈 
+ 
+ 临时数据使用onSaveInstanceState保存恢复，永久性数据使用onPause方法保存。
+ 
+ 
+ 4利用Fragment存储大量数据，大数据！！！！！！
+ 
+ 
+ 由于configuration change导致Activity销毁的时候，Activity中标记为保留的Fragment不会销毁，所以可以利用该特性实现存取数据，具体方法如下：
+
+扩展Fragment类，并定义好相应字段存取数据，对外暴露出设置数据和获取数据的方法，比如setData和getData
+
+在Fragment的onCreate方法中调用方法setRetainInstance(true)，标记该Fragment为保留的
+
+将该Fragment加入到Activity中
+
+在Activity的onDestroy方法中将activity的中需要保存的数据调用Fragment中上述定义的setData方法，将其保存在Fragment中
+
+在Activity销毁重新生成执行onCreate的时候，重新从Fragmet中调用getData获取之前保存的数据
+
+最后需要注意内存泄露的发生，练习一个例子吧！
