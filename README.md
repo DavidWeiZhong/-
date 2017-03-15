@@ -611,4 +611,4 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 }
-当旋转屏幕的时候输出     保存的bitmap--我就是要保存的bitmap
+当旋转屏幕的时候输出    保存的bitmap--我就是要保存的bitmap
