@@ -77,6 +77,7 @@ public class RecycleView extends AppCompatActivity {
 
     class MyViewHolder extends RecyclerView.ViewHolder{
         TextView tv;
+
         public MyViewHolder(View itemView) {
             super(itemView);
             tv = (TextView) itemView.findViewById(R.id.tv);
