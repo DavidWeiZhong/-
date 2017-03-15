@@ -1,25 +1,27 @@
 package com.example.lcit.myapplication;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 /**
  * 用fragment保存大数据
  */
 public class MainActivity extends AppCompatActivity {
 
-    private Bitmap mBitmap, bitmap;
+    private String mBitmap = "我就是要保存的bitmap";
 //    mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState.getBoolean("image")) {
+        if (savedInstanceState != null) {
             BitmapDataFragment fragment = (BitmapDataFragment) getSupportFragmentManager()
                     .findFragmentByTag(BitmapDataFragment.TAG);
-            bitmap = fragment.getData();
+            String bitmap = fragment.getData();
+
+            Log.d("print", "保存的bitmap--" + bitmap);
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
         }
     }

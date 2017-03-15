@@ -9,17 +9,17 @@ import android.support.v4.app.Fragment;
  */
 public class BitmapDataFragment extends Fragment {
     public static final String TAG = "bitmapsaver";
-    private Bitmap bitmap;
+    private String bitmap;
 
     public BitmapDataFragment() {
 
     }
 
-    private BitmapDataFragment(Bitmap bitmap) {
+    private BitmapDataFragment(String bitmap) {
         this.bitmap = bitmap;
     }
 
-    public static BitmapDataFragment newInstance(Bitmap bitmap) {
+    public static BitmapDataFragment newInstance(String bitmap) {
         return new BitmapDataFragment(bitmap);
     }
 
@@ -29,7 +29,7 @@ public class BitmapDataFragment extends Fragment {
         setRetainInstance(true);//关键啊
     }
 
-    public Bitmap getData() {
+    public String getData() {
         return bitmap;
     }
 }
