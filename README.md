@@ -612,3 +612,172 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 当旋转屏幕的时候输出    保存的bitmap--我就是要保存的bitmap
+
+#重温ListView，RecycleView瀑布流形式
+
+值得注意的是RecycleView与ListView的用法基本相似，只是RecycleView多了一个mRecyclerView.setLayoutManager(new LinearLayoutManager(this));//普通形式
+不然显示不出来
+listview；涉及到了ListView的优化了。
+
+1，convertView的复用
+2，用一个最好是静态的ViewHolder用来缓存控件
+/**
+ * listview的使用，今天回忆了一下listview的使用
+ */
+public class MainActivity extends AppCompatActivity {
+
+    private ListView mListView;
+    private List<String> date = new ArrayList<>();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mListView = (ListView) findViewById(R.id.listView);
+        for (int i = 0; i < 100; i++) {
+            date.add(i + "");
+        }
+        MyAdapter myAdapter = new MyAdapter(this, date);
+        mListView.setAdapter(myAdapter);
+
+    }
+
+    class MyAdapter extends BaseAdapter {
+        private Context mContext;
+        private List<String> date;
+        public MyAdapter(Context context, List<String> date) {
+            this.mContext = context;
+            this.date = date;
+        }
+        @Override
+        public int getCount() {
+            return date.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return date.get(i);
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return i;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            MyViewHolder myViewHolder = null;
+            if (view == null) {
+                view = View.inflate(mContext, R.layout.item_list, null);
+                myViewHolder = new MyViewHolder();
+                myViewHolder.mTextView = (TextView) view.findViewById(R.id.tv);
+                view.setTag(myViewHolder);
+            } else {
+                myViewHolder = (MyViewHolder) view.getTag();
+            }
+            if (i == date.size() - 1) {
+                myViewHolder.mTextView.setText("+");
+            } else {
+                myViewHolder.mTextView.setText(date.get(i));
+            }
+            myViewHolder.mTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(mContext, RecycleView.class));
+                }
+            });
+            return view;
+        }
+
+        class MyViewHolder {
+            TextView mTextView;
+        }
+    }
+}
+
+
+2，讲一下RecycleView的瀑布流形式吧，其实就是在onBindViewHolder方法中随机给item一个高度，也就产生了瀑布流形式了，另外还必须设置为
+
+ mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));//瀑布流形式
+                
+   不能设置为mRecyclerView.setLayoutManager(new GridLayoutManager(this,4));//瀑布流形式，不然没有效果
+   
+   
+   
+   
+   public class RecycleView extends AppCompatActivity {
+
+    private RecyclerView mRecyclerView;
+    private List<String> date = new ArrayList<>();
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_recycle_view);
+        mRecyclerView = (RecyclerView) findViewById(R.id.rv);
+        for (int i = 0; i < 1000; i++) {
+            date.add("" + i);
+        }
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));//普通形式
+//        mRecyclerView.setLayoutManager(new GridLayoutManager(this,4));//瀑布流形式
+        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3,
+                StaggeredGridLayoutManager.VERTICAL));//瀑布流形式
+        MyAdapter myAdapter = new MyAdapter(date);
+        mRecyclerView.setAdapter(myAdapter);
+
+    }
+
+    class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
+
+        private List<String> date;
+        private List<Integer> height;
+        public MyAdapter(List<String> date){
+            this.date = new ArrayList<>();
+            this.height = new ArrayList<>();
+            for (int i = 0; i < date.size(); i ++) {
+                height.add((int) (100 + Math.random() * 300));
+            }
+            this.date = date;
+        }
+
+
+        @Override
+        public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            MyViewHolder myViewHolder = new MyViewHolder(LayoutInflater.from(RecycleView.this).inflate(R.layout.item_list,
+                    parent, false));
+            return myViewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(MyViewHolder holder, int position) {
+            holder.tv.setText(date.get(position) + "RecycleView");
+            ViewGroup.LayoutParams p = holder.tv.getLayoutParams();
+//            LayoutParams p =  holder.tv.getLayoutParams();
+            p.height = this.height.get(position);
+            holder.tv.setLayoutParams(p);
+//            holder.tv.setHeight((int)(Math.random() * 100));
+//            holder.tv.setHeight(1010);
+        }
+
+        @Override
+        public int getItemCount() {
+            return date.size();
+        }
+    }
+
+    class MyViewHolder extends RecyclerView.ViewHolder{
+
+        TextView tv;
+        public MyViewHolder(View itemView) {
+            super(itemView);
+            tv = (TextView) itemView.findViewById(R.id.tv);
+        }
+    }
+}
+
+
+效果图如下![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170315161626.png)
+                
+             
+                
+                
+                
+       
