@@ -15,9 +15,9 @@ private Handler mHandler = new Handler() {
 };
 
 为什么呢？非静态内部类会引用外部类对象（Activity），当它使用了 postDelayed 的时候，如果 Activity 已经 finish 了，而这个 handler 仍然引用着这个 Activity 就会致使内存泄漏，因为这个 handler 会在一段时间内继续被 mainLooper 持有，导致引用仍然存在，在这段时间内，如果内存不够使，可能OOM了。所以在这里要是使用了handle.postdelayed的时候就很可能造成你村泄漏
-在自定义MyHander类中实例化一个外部类的WeakReference（弱引用）并且在Handler初始化时传入这个对象给你的Handler；将所有引用的外部类成员使用
+在自定义静态MyHander类中实例化一个外部类的WeakReference（弱引用）并且在Handler初始化时传入这个对象给你的Handler；将所有引用的外部类成员使用
 
-WeakReference对象，英文静态内部类不会持有外部类的引用
+WeakReference对象，因为静态内部类不会持有外部类的引用
 
 
 2，资源释放问题
@@ -546,4 +546,69 @@ public class MainActivity extends AppCompatActivity {
 
 在Activity销毁重新生成执行onCreate的时候，重新从Fragmet中调用getData获取之前保存的数据
 
-最后需要注意内存泄露的发生，练习一个例子吧！
+最后需要注意内存泄露的发生，练习一个例子吧！，其本质还是通过onSaveInstanceState来保存fragment，然后在重fragment中取出数据
+这里我就不模拟保存bitmap了，就先模拟保存String吧bitmap其实也是一样的！！。调整手机位置横竖屏以后就可以看出效果
+
+
+public class BitmapDataFragment extends Fragment {
+    public static final String TAG = "bitmapsaver";
+    private String bitmap;
+
+    public BitmapDataFragment() {
+
+    }
+
+    private BitmapDataFragment(String bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public static BitmapDataFragment newInstance(String bitmap) {
+        return new BitmapDataFragment(bitmap);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);//关键啊
+    }
+
+    public String getData() {
+        return bitmap;
+    }
+}
+
+
+
+public class MainActivity extends AppCompatActivity {
+
+    private String mBitmap = "我就是要保存的bitmap";
+//    mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null) {
+            BitmapDataFragment fragment = (BitmapDataFragment) getSupportFragmentManager()
+                    .findFragmentByTag(BitmapDataFragment.TAG);
+            String bitmap = fragment.getData();
+
+            Log.d("print", "保存的bitmap--" + bitmap);
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (mBitmap != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(BitmapDataFragment.newInstance(mBitmap), BitmapDataFragment.TAG)
+                    .commit();
+            outState.putBoolean("image", true);
+        } else {
+            outState.putBoolean("image", false);
+        }
+        super.onSaveInstanceState(outState);
+    }
+}
+当旋转屏幕的时候输出     保存的bitmap--我就是要保存的bitmap
