@@ -919,6 +919,28 @@ xml文件为
         
         下面是效果图，
         ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316142253.png)
+        
+        
+        
+  
+  #事件分发机制
+  
+ 三个对象，Activity， ViewGroup， View
+  1，涉及到三个方法，
+  
+  dispatchTouchEvent();分发点击事件，默认实现，
+  1，若返回return super.dispatchTouchEvent(event);即默认实现，则其中的down,up,move都会在改方法中执行，并且会把事件传递给    onTouchEvent,并且如果ontouchEvent也是返回return super.onTouchEvent(event);则在onTouchEvent方法中down,up,move也会执行，同时，如果view中在Activity中设置了点击事件，则也会执行
+   ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316164957.png)
+  
+  2，若返回 TRUE，表示消费事件，且事件不会往下传递，后续事件会继续分发到该view，即如果返回TRUE,则ontouchEvent（）不会调用
+  在dispatchTouchEvent中的down,up， move有效，但是在activity中的点击事件没有用了。
+   ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316163724.png)
+  
+  3，若返回 FALSE，不消费事件，并且事件停止传递，onTouchEvent不会执行，将事件回传给父控件的onTouchEvent，同时在改方法中只会d监听到down，activity中的点击事件不会执行，
+  ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316164712.png)
+  
+  onInterceptTouchEvent();这个方法只有把ViewGroup中才有
+  onTouchEvent()
                 
              
                 
