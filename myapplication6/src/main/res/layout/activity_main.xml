@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:background="#00f"
-        android:padding="20dp"
+        android:padding="50dp"
         app:circle_color="#1d080f"/>
 
 
