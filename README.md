@@ -926,8 +926,7 @@ xml文件为
   #事件分发机制
   
  三个对象，Activity， ViewGroup， View
-  1，涉及到三个方法，
-  
+  1，涉及到三个方法，大前提，onInterceptTouchEvent，onTouchEvent，都是在dispatchTouch（）方法中执行的
   dispatchTouchEvent();分发点击事件，默认实现，
   1，若返回return super.dispatchTouchEvent(event);即默认实现，则其中的down,up,move都会在改方法中执行，并且会把事件传递给    onTouchEvent,并且如果ontouchEvent也是返回return super.onTouchEvent(event);则在onTouchEvent方法中down,up,move也会执行，同时，如果view中在Activity中设置了点击事件，则也会执行
    ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316164957.png)
@@ -939,11 +938,121 @@ xml文件为
   3，若返回 FALSE，不消费事件，并且事件停止传递，onTouchEvent不会执行，将事件回传给父控件的onTouchEvent，同时在改方法中只会d监听到down，activity中的点击事件不会执行，
   ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316164712.png)
   
-  onInterceptTouchEvent();这个方法只有把ViewGroup中才有
-  onTouchEvent()
+  onInterceptTouchEvent();这个方法只有把ViewGroup中才有，是否拦截当前事件
+  
+  
+  onTouchEvent()，是否消费当前事件，
+  一下测试都是在dispatchTouchEvent,返回return super.dispatchTouchEvent(event)，下进行测试的
+  1，如果返回return super.onTouchEvent(event);，怎所有move，up, down都会执行
+  
+  
+  2，返回TRUE，自己处理事件，并且事件不会往下传递，后续事件让其处理，其up,down,move都会执行，但是activity中的事件不会执行
                 
+      ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316170537.png)    
+      
+      
+
+
+3，返回FALSE，不处理事件，将事件传递给父控件的onTouchEvent()处理。当前view不在接受此事件的其他事件，与dispatchTouchEvent（）,onInterceptTouchEvent()的区别，其也会执行,up, down, move
+
+ ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316170537.png) 
+ 
+ 相关代码
+ 
+ public class MyButton extends Button {
+    public MyButton(Context context) {
+        super(context);
+        init();
+    }
+
+    public MyButton(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    public MyButton(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    public void init() {
+
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+//        Log.d("print", "MyButton  dispatchTouchEvent");//点击一次，抬起一次
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d("print", "ACTION_DOWN  dispatchTouchEvent");
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.d("print", "ACTION_MOVE  dispatchTouchEvent");
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d("print", "ACTION_UP  dispatchTouchEvent");
+                break;
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+//        Log.d("print", "MyButton  onTouchEvent");
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d("print", "ACTION_DOWN  onTouchEvent");
+                break;
+            case MotionEvent.ACTION_MOVE:
+                Log.d("print", "ACTION_MOVE  onTouchEvent");
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.d("print", "ACTION_UP  onTouchEvent");
+                break;
+        }
+        return false;
+    }
+}
+
+
+
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+    public void btnclick(View view) {
+
+        Log.d("print", "点击有效");
+    }
+}
+
+
+
+
+xml文件中
+ <com.example.lcit.myapplication.MyButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="btnclick"
+        android:text="MYButton!"/>
+        
+
+总结，Android事件分发本质事要解决，事件是要有那个发出，经过那个对象，最终到达那个对象，并最终得到处理，对象是指activity， ViewGroup，View
+
+Android中事件分发顺序：Activity（Window） -> ViewGroup -> View
+
+
+事件分发过程由dispatchTouchEvent() 、onInterceptTouchEvent()和onTouchEvent()三个方法协助完成
+
+![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316171950.png) 
+
+
+下面处理一个具体的案例
              
-                
-                
                 
        
