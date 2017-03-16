@@ -703,10 +703,9 @@ public class MainActivity extends AppCompatActivity {
 
  mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));//瀑布流形式
                 
-   不能设置为mRecyclerView.setLayoutManager(new GridLayoutManager(this,4));//瀑布流形式，不然没有效果
-   
-   
-   
+   不能设置为mRecyclerView.setLayoutManager(new GridLayoutManager(this,4));//瀑布流形式，不然没有效果，
+  主要还是在 onBindViewHolder这个方法中 设置
+  一个随机数控制item的高度，达到瀑布流的效果 
    
    public class RecycleView extends AppCompatActivity {
 
@@ -721,10 +720,18 @@ public class MainActivity extends AppCompatActivity {
             date.add("" + i);
         }
 //        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));//普通形式
+
+
 //        mRecyclerView.setLayoutManager(new GridLayoutManager(this,4));//瀑布流形式
-        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3,
-                StaggeredGridLayoutManager.VERTICAL));//瀑布流形式
+
+
+
+        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));//瀑布流形式
+        
+        
         MyAdapter myAdapter = new MyAdapter(date);
+        
+        
         mRecyclerView.setAdapter(myAdapter);
 
     }
