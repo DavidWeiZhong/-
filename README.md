@@ -775,6 +775,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 效果图如下![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170315161626.png)
+
+其中要注意的是白色的分割线，其实就是在item.xml文件的跟布局中设置了一个margin就会产生分割显得效果了。
                 
              
                 
