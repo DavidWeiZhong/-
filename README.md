@@ -1079,6 +1079,13 @@ public boolean dispatchTouchEvent(MotionEvent ev) {
     return consume;
    }
 
+一个小结论
+onTouch（）的执行高于onClick（）
+每当控件被点击时：
+如果在回调onTouch()里返回false，就会让dispatchTouchEvent方法返回false，那么就会执行onTouchEvent()；如果回调了setOnClickListener()来给控件注册点击事件的话，最后会在performClick()方法里回调onClick()。
+onTouch()返回false（该事件没被onTouch()消费掉） = dispatchTouchEvent()返回false（继续向下传递） = 执行onTouchEvent() = 执行OnClick()
+如果在回调onTouch()里返回true，就会让dispatchTouchEvent方法返回true，那么将不会执行onTouchEvent()，即onClick()也不会执行；
+onTouch()返回true（该事件被onTouch()消费掉） = dispatchTouchEvent()返回true（不会再继续向下传递） = 不会执行onTouchEvent() = 不会执行OnClick()
 
 下面处理一个具体的案例
              
