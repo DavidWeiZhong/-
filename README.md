@@ -1053,6 +1053,8 @@ Android中事件分发顺序：Activity（Window） -> ViewGroup -> View
 下面这张图也是很厉害
 ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/944365-9ce60722ac0a9a36.png)
 
+你可以参考http://www.jianshu.com/p/38015afcdb58
+
 // 点击事件产生后，会直接调用dispatchTouchEvent（）方法
 public boolean dispatchTouchEvent(MotionEvent ev) {
 
