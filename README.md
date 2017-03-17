@@ -953,8 +953,7 @@ xml文件为
       
 
 
-3，返回FALSE，不处理事件，将事件传递给父控件的onTouchEvent()处理。当前view不在接受此事件的其他事件，与dispatchTouchEvent（）,onInterceptTouchEvent()的区别，其也会执行,up, down, move
-
+3，返回FALSE，不处理事件，将事件传递给父控件的onTouchEvent()处理。当前view不在接受此事件的其他事件，与dispatchTouchEvent（）,onInterceptTouchEvent()的区别，其也会执行,up，注意这里不会执行move，up了，因为其已经不再接受view的其他事件了，即如果鼠标点下去不放手，然后移动是不会触发move事件的，但是如果返回true就会触发了。
  ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316170537.png) 
  
  相关代码
@@ -1053,6 +1052,31 @@ Android中事件分发顺序：Activity（Window） -> ViewGroup -> View
 
 下面这张图也是很厉害
 ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/944365-9ce60722ac0a9a36.png)
+
+// 点击事件产生后，会直接调用dispatchTouchEvent（）方法
+public boolean dispatchTouchEvent(MotionEvent ev) {
+
+    //代表是否消耗事件
+    boolean consume = false;
+
+
+    if (onInterceptTouchEvent(ev)) {
+    //如果onInterceptTouchEvent()返回true则代表当前View拦截了点击事件
+    //则该点击事件则会交给当前View进行处理
+    //即调用onTouchEvent (）方法去处理点击事件
+      consume = onTouchEvent (ev) ;
+
+    } else {
+      //如果onInterceptTouchEvent()返回false则代表当前View不拦截点击事件
+      //则该点击事件则会继续传递给它的子元素
+      //子元素的dispatchTouchEvent（）就会被调用，重复上述过程
+      //直到点击事件被最终处理为止
+      consume = child.dispatchTouchEvent (ev) ;
+    }
+
+    return consume;
+   }
+
 
 下面处理一个具体的案例
              
