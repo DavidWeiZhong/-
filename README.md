@@ -1160,6 +1160,7 @@ public class MainActivity extends AppCompatActivity {
 }
 
 
+
 ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170317154800.png)
 
 在google的io大会上面volley非常生动形象的说明了volley适用于数量大，但是数据体积不大，通信平凡的场景
