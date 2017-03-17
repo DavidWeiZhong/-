@@ -1088,6 +1088,85 @@ onTouch()返回false（该事件没被onTouch()消费掉） = dispatchTouchEvent
 onTouch()返回true（该事件被onTouch()消费掉） = dispatchTouchEvent()返回true（不会再继续向下传递） = 不会执行onTouchEvent() = 不会执行OnClick()
 
 下面处理一个具体的案例
+
+
+
+#volley的使用，适用于数量多，但是数据体积不大的数据
+
+
+public class MainActivity extends AppCompatActivity {
+
+    private ImageView mImageView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mImageView = (ImageView) findViewById(R.id.iv);
+    }
+
+    /**
+     * 通过volley获得json数据
+     * @param view
+     */
+    public void getJson(View view) {
+        Log.d("print", "点击有效");
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                "http://www.baidu.com",
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("print", "" + response.toString());
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("print", "" + error.getMessage());
+                    }
+                });
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    /**
+     * 移步加载图片
+     * @param view
+     */
+    public void getImage(View view) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+        final LruCache<String, Bitmap> lruCache = new LruCache<>(20);
+
+        ImageLoader.ImageCache imageCache = new ImageLoader.ImageCache() {
+            @Override
+            public Bitmap getBitmap(String url) {
+                return lruCache.get(url);
+            }
+
+            @Override
+            public void putBitmap(String url, Bitmap bitmap) {
+                    lruCache.put(url, bitmap);
+            }
+        };
+
+        ImageLoader imageLoader = new ImageLoader(requestQueue, imageCache);
+
+        ImageLoader.ImageListener imageListener = imageLoader.getImageListener(mImageView, R.mipmap.ic_launcher, R.mipmap.ic_launcher);
+
+        imageLoader.get("http://g.hiphotos.baidu.com/image/pic/item/1ad5ad6eddc451da7f05e1efb4fd5266d11632c7.jpg", imageListener);
+    }
+}
+
+
+![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170317154800.png)
+
+在google的io大会上面volley非常生动形象的说明了volley适用于数量大，但是数据体积不大，通信平凡的场景
+
+![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170317154951.png)
+
+
              
                 
        
