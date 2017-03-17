@@ -1051,6 +1051,8 @@ Android中事件分发顺序：Activity（Window） -> ViewGroup -> View
 
 ![image](https://github.com/DavidWeiZhong/-/blob/master/pic/QQ截图20170316171950.png) 
 
+下面这张图也是很厉害
+![image](https://github.com/DavidWeiZhong/-/blob/master/pic/944365-9ce60722ac0a9a36.png)
 
 下面处理一个具体的案例
              

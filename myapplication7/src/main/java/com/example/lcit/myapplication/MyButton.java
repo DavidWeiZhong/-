@@ -60,6 +60,6 @@ public class MyButton extends Button {
                 Log.d("print", "ACTION_UP  onTouchEvent");
                 break;
         }
-        return false;
+        return true;
     }
 }
