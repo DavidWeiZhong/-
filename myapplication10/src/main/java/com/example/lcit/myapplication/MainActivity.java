@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                         .view(R.layout.dialog_loginerror)
                         .heightDimenRes(R.dimen.dialog_loginerror_height)
                         .widthDimenRes(R.dimen.dialog_loginerror_width)
-                        .style(R.style.Dialog)
+                        .style(R.style.Dialog)//一般设置为透明的
                         .addViewOnclick(R.id.btn_cancel,new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
